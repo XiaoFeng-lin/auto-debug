@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "adapters": [
+    {
+      "id": "smart-sync",
+      "name": "smart-sync",
+      "description": "Python 异步同步客户端",
+      "match": {
+        "directories": ["sync"],
+        "files": ["build.py", "requirements.txt", "sync/smart_sync.py"]
+      },
+      "reference": "references/smart-sync.md",
+      "priority": 10
+    },
+    {
+      "id": "sync-core-service",
+      "name": "sync-core-service",
+      "description": "C++17 Node.js 原生插件",
+      "match": {
+        "files": ["CMakeLists.txt", "package.json", "src/node_addon/node_addon.cpp"]
+      },
+      "reference": "references/sync-core-service.md",
+      "priority": 10
+    }
+  ],
+  "fallback": {
+    "id": "generic",
+    "name": "generic",
+    "description": "通用项目，无特殊适配",
+    "reference": null
+  }
+}

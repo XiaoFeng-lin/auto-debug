@@ -60,33 +60,46 @@
 
 - 不修改原始日志文件
 - 未经用户确认不修改任何项目代码
-- 输出文件仅写入用户指定的日志路径
+- 输出文件仅写入日志路径的 `auto-debug/` 子目录或系统临时目录
 - 不执行有副作用的命令（数据库操作、网络请求等）
 
 ## 配置参数
 
-配置优先级：命令行参数 > 项目级 `.auto-debug-config.json` > 全局 `~/.auto-debug/config.json` > 内置默认值。
+**配置唯一来源**：skill 内置的 `auto-debug/config/default-config.json`。不在项目目录创建任何配置文件，不读取全局配置。
 
-关键默认值：上下文行数 5 | 子 Agent 超时 120s | 单文件匹配上限 500 行 | 总匹配上限 1000 行。
+关键默认值：上下文行数 5 | 子 Agent 超时 300s | 单文件匹配上限 500 行 | 总匹配上限 1000 行。
 
 ## 项目文件结构
 
 ```
-auto-debug/
-├── SKILL.md                    ← 核心 Skill 文件
-├── CLAUDE.md                   ← Claude Code 项目指引
-├── AGENTS.md                   ← 本文件（通用 Agent 指引）
-├── README.md                   ← 项目说明
-├── config/
-│   └── default-config.json     ← 配置文件模板
-├── docs/
-│   ├── PRD.md                  ← 产品规格文档
-│   ├── USER_GUIDE.md           ← 用户指南
-│   ├── RUNBOOK.md              ← 运维手册
-│   ├── ARCHITECTURE.md         ← 技术设计与实施计划
-│   └── archive/                ← 归档文档
+auto-debug/                          # GitHub 仓库根目录
+├── README.md                        # 项目说明
+├── CHANGELOG.md                     # 版本变更记录
+├── CLAUDE.md                        # Claude Code 项目指引
+├── AGENTS.md                        # 本文件（通用 Agent 指引）
+│
+├── auto-debug/                      # ← Skill 实际内容
+│   ├── SKILL.md                     # 核心 Skill 文件（通用流程，< 500 行）
+│   ├── config/
+│   │   ├── default-config.json      # 运行时参数默认值（唯一配置来源）
+│   │   └── project-adapters-config.json # 项目适配器注册表
+│   └── references/
+│       ├── smart-sync.md            # smart-sync 特定知识（按需加载）
+│       └── sync-core-service.md     # sync-core-service 特定知识（按需加载）
+│
+├── docs/                            # 开发文档
+│   ├── README.md                    # 文档导航索引
+│   ├── spec/
+│   │   ├── PRD.md                   # 产品规格文档
+│   │   └── PRD-review-report-v1.md  # PRD 评审报告
+│   ├── plan/
+│   │   └── IMPLEMENTATION_PLAN.md   # 实施计划与验证清单
+│   ├── USER_GUIDE.md                # 用户指南
+│   ├── RUNBOOK.md                   # 运维手册
+│   └── dev-log/                     # 开发过程记录
+│
 └── tests/
-    └── test-cases.md           ← 测试用例
+    └── test-cases.md                # 测试用例
 ```
 
 ## 编码规范

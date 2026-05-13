@@ -4,16 +4,21 @@
 
 ### 安装
 
-将 `auto-debug` Skill 放置在项目的 `.claude/skills/auto-debug/` 目录下：
+通过 Vercel 的 `skills` CLI 工具一键安装：
 
+```bash
+npx skills add https://github.com/XiaoFeng-lin/auto-debug --skill auto-debug
 ```
-your-project/
-├── .claude/
-│   └── skills/
-│       └── auto-debug/
-│           └── SKILL.md
-├── .auto-debug-config.json    ← 可选配置文件
-└── ...（项目代码）
+
+**为什么需要 `--skill auto-debug`**：
+本仓库根目录包含开发文档（docs/、tests/ 等），Skill 的实际内容位于 `auto-debug/` 子目录中。使用 `--skill auto-debug` 可确保只安装必要的 skill 文件。
+
+### 更新
+
+```bash
+npx skills update auto-debug
+# 或跳过确认
+npx skills update auto-debug -y
 ```
 
 ### 调用方式
@@ -100,30 +105,26 @@ auto-debug 会自动识别以下项目类型并启用特定诊断逻辑：
 | 仅采纳分析 | 认可诊断但暂不修复 |
 | 否决 | 不认可分析结果，流程终止 |
 
-## 配置文件
+## 配置
 
-在项目根目录创建 `.auto-debug-config.json` 自定义行为：
-
-```json
-{
-  "log_context_lines": 5,
-  "sub_agent_timeout": 120,
-  "max_matches_per_file": 500,
-  "max_total_matches": 1000,
-  "log_level_filter": "ERROR,WARNING",
-  "max_log_files": 50
-}
-```
+auto-debug 的所有配置参数存储在 skill 安装目录的 `config/default-config.json` 中，由 Skill 自动读取，**无需在项目目录下创建任何配置文件**。
 
 | 配置项 | 默认值 | 说明 |
 |--------|--------|------|
 | `log_context_lines` | 5 | 匹配行前后各提取的行数 |
-| `sub_agent_timeout` | 120 | 子 Agent 最大执行时间（秒） |
+| `sub_agent_timeout` | 300 | 子 Agent 最大执行时间（秒） |
 | `max_matches_per_file` | 500 | 单文件匹配行数上限 |
 | `max_total_matches` | 1000 | 总匹配行数上限 |
 | `log_level_filter` | ERROR,WARNING | 优先检索的日志级别 |
 | `max_log_files` | 50 | 目录下最多分析的日志文件数 |
-| `enable_commit_comparison` | true | 是否启用 commit 比对（通用项目建议设为 false） |
+| `enable_commit_comparison` | true | 是否启用 commit 比对 |
+
+## 输出文件位置
+
+| 场景 | 提取日志 | 诊断报告 |
+|------|----------|----------|
+| 提供日志路径 | `{log_path}/auto-debug/auto_debug_extracted_*.log` | `{log_path}/auto-debug/auto_debug_report_*.md` |
+| 内联日志 | `%TEMP%/auto-debug/auto_debug_extracted_*.log` | `%TEMP%/auto-debug/auto_debug_report_*.md` |
 
 ## 注意事项
 
@@ -131,4 +132,5 @@ auto-debug 会自动识别以下项目类型并启用特定诊断逻辑：
 - 修复前必须用户确认，不会擅自修改代码
 - 日志提取使用搜索策略，不会全文读取大文件
 - 原始日志文件不会被修改
-- 输出文件（提取结果、诊断报告）保存在用户指定的日志路径下
+- **所有输出文件集中在 `auto-debug/` 子目录中**，不会污染项目目录或日志根目录
+- 不在项目目录下创建任何非项目文件（包括配置文件）

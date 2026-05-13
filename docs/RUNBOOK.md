@@ -2,21 +2,31 @@
 
 ## 安装与部署
 
-### 项目级安装
-
-将 Skill 文件放置在项目目录下：
+### 推荐方式：npx skills add
 
 ```bash
-# 在项目根目录执行
-mkdir -p .claude/skills/auto-debug
-# 将 SKILL.md 复制到该目录
+npx skills add https://github.com/XiaoFeng-lin/auto-debug --skill auto-debug
 ```
 
-### 用户级安装（所有项目可用）
+### 手动安装
 
 ```bash
+# 克隆仓库
+git clone https://github.com/XiaoFeng-lin/auto-debug.git
+
+# 复制 skill 内容到 Claude Code Skill 目录
 mkdir -p ~/.claude/skills/auto-debug
-# 将 SKILL.md 复制到该目录
+cp auto-debug/SKILL.md ~/.claude/skills/auto-debug/
+cp -r auto-debug/config/ ~/.claude/skills/auto-debug/
+cp -r auto-debug/references/ ~/.claude/skills/auto-debug/
+```
+
+### 更新
+
+```bash
+npx skills update auto-debug
+# 或跳过确认
+npx skills update auto-debug -y
 ```
 
 ### 验证安装
@@ -37,8 +47,8 @@ mkdir -p ~/.claude/skills/auto-debug
 
 **解决**：
 1. 在 `--time` 参数中指定时间范围缩小搜索
-2. 在 `.auto-debug-config.json` 中增大 `sub_agent_timeout` 值
-3. 指定具体的日志文件而非目录
+2. 指定具体的日志文件而非目录
+3. 如频繁超时，可在 skill 安装目录的 `config/default-config.json` 中增大 `sub_agent_timeout` 值
 
 ### Q3: 代码分析无法定位根因
 
@@ -80,23 +90,25 @@ mkdir -p ~/.claude/skills/auto-debug
 
 ### Skill 无法调用
 
-1. 检查 `.claude/skills/auto-debug/SKILL.md` 文件是否存在
-2. 检查 frontmatter 格式是否正确（YAML 语法）
-3. 检查 `name` 字段是否为 `auto-debug`
-4. 重启 Claude Code 重新加载技能
+1. 检查 `~/.claude/skills/auto-debug/SKILL.md` 文件是否存在
+2. 检查 `~/.claude/skills/auto-debug/config/` 和 `references/` 目录是否存在
+3. 检查 frontmatter 格式是否正确（YAML 语法）
+4. 检查 `name` 字段是否为 `auto-debug`
+5. 重启 Claude Code 重新加载技能
 
 ### 子 Agent 超时
 
 1. 检查日志文件大小（`ls -la <log_path>`）
 2. 检查 ripgrep 是否可用（`rg --version`）
-3. 在配置中增大 `sub_agent_timeout`
+3. 在 skill 安装目录的 `config/default-config.json` 中增大 `sub_agent_timeout`
 4. 尝试缩小搜索范围（指定 `--time` 和 `--keyword`）
 
 ### 报告文件无法写入
 
 1. 检查日志路径的写入权限
-2. 如果路径不可写，报告仍会在终端展示
-3. 手动保存终端中的报告内容
+2. 检查日志路径下是否能创建 `auto-debug/` 子目录
+3. 如果路径不可写，报告仍会在终端展示
+4. 内联日志场景下，检查系统临时目录（`%TEMP%` 或 `/tmp`）是否可写
 
 ## 监控指标
 
@@ -114,10 +126,24 @@ auto-debug 每次执行后建议记录以下指标（目前需手动）：
 | 版本 | 日期 | 变更 |
 |------|------|------|
 | 1.0 | 2026-04-30 | 初始版本，支持 smart-sync、sync-core-service、通用项目 |
+| 1.1 | 2026-05-12 | 重构：Skill 拆分为通用核心 + 按需加载的 reference 文件；支持 npx skills add 安装；配置来源简化为 skill 内置；输出路径统一为 auto-debug/ 子目录 |
 
 ## 升级指南
 
-1. 备份当前 `SKILL.md` 和 `.auto-debug-config.json`
-2. 替换 `SKILL.md` 为新版本
-3. 比较新版本的配置文件模板，更新 `.auto-debug-config.json`
-4. 运行一次测试验证功能正常
+### 从 1.0 升级到 1.1
+
+1. 删除旧版本 skill 目录
+   ```powershell
+   # Windows
+   Remove-Item -Recurse -Force "$env:USERPROFILE\.claude\skills\auto-debug"
+   ```
+2. 用 npx skills add 重新安装
+   ```bash
+   npx skills add https://github.com/XiaoFeng-lin/auto-debug --skill auto-debug
+   ```
+
+### 常规更新
+
+```bash
+npx skills update auto-debug -y
+```

@@ -1,15 +1,13 @@
 {
   "log_context_lines": 5,
-  "sub_agent_timeout": 120,
+  "sub_agent_timeout": 300,
   "max_matches_per_file": 500,
   "max_total_matches": 1000,
   "sub_agent_result_max_size": "100KB",
   "log_level_filter": "ERROR,WARNING",
-  "max_total_duration": 300,
-  "file_read_timeout": 10,
+  "max_total_duration": 1800,
+  "file_read_timeout": 30,
   "grep_timeout": 30,
   "max_log_files": 50,
-  "default_log_files": "debug.log*,monitor.log*",
-  "enable_commit_comparison": true,
-  "check_debug_logging": true
+  "enable_commit_comparison": true
 }
